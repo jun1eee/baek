@@ -1,36 +1,27 @@
-n, m = map(int, input().split())
-arr = [list(map(int,input().split())) for _ in range(n)]
-visited = [[False]*m for _ in range(n)]
-dirs = [(-1,0),(1,0),(0,-1),(0,1)]
+import sys
+from collections import deque
+input = sys.stdin.readline
+tob = [None] + [deque(input().rstrip()) for _ in range(4)]
+k = int(input())
+for _ in range(k):
+    num, d = map(int, input().split())
+    rot = [0]*5
+    rot[num] = d
+    for i in range(num-1,0,-1):
+        if tob[i][6] != tob[i+1][2]:
+            rot[i] = -rot[i+1]
+        else:
+            break
+    for i in range(num+1, 5):
+        if tob[i-1][2] != tob[i][6]:
+            rot[i] = -rot[i-1]
+        else:
+            break
+    for i in range(1,5):
+        if rot[i] != 0:
+            tob[i].rotate(rot[i])
 ans = 0
-def back(r, c, depth, total):
-    global ans
-    if depth == 4:
-        ans = max(ans, total)
-        return
-    for dr, dc in dirs:
-        nr, nc = r+dr, c+dc
-        if 0<=nr<n and 0<=nc<m and not visited[nr][nc]:
-            visited[nr][nc] = True
-            back(nr, nc, depth+1, total+arr[nr][nc])
-            visited[nr][nc] = False
-
-def check_T(r, c):
-    global ans
-    tmp = []
-    for dr, dc in dirs:
-        nr, nc = r+dr, c+dc
-        if 0<=nr<n and 0<=nc<m:
-            tmp.append(arr[nr][nc])
-    if len(tmp) >= 3:
-        tmp.sort(reverse=True)
-        ans = max(ans, arr[r][c]+tmp[0]+tmp[1]+tmp[2])
-
-for i in range(n):
-    for j in range(m):
-        visited[i][j] = True
-        back(i,j,1,arr[i][j])
-        visited[i][j] = False
-        
-        check_T(i,j)
+for i in range(1,5):
+    if tob[i][0] == '1':
+        ans += 2 ** (i-1)
 print(ans)
